@@ -3,5 +3,8 @@
       <img src="/static/icons/logo.svg?v={{ build }}" alt="" width="32" height="32">
       <span>Beer OG Calculator<small>refractometer correction</small></span>
     </div>
-    <button class="ghost" @click="settingsOpen = !settingsOpen" :aria-expanded="String(settingsOpen)" aria-expanded="false" aria-controls="settings">Settings</button>
+    <div class="top-actions">
+      <a class="ghost help" href="/formulas" aria-label="Formulas and explanations" title="Formulas and explanations">?</a>
+      <button class="ghost" @click="settingsOpen = !settingsOpen" :aria-expanded="String(settingsOpen)" aria-expanded="false" aria-controls="settings">Settings</button>
+    </div>
   </header>

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{#- One term of a polynomial, on its own row so long equations fit a phone.
+    v is the variable's subscript ("o"/"r" for Brix) or "SG"; p is its power,
+    0 for a constant. Coefficients are written exactly as in gravity.js —
+    tests/routes.rs checks that every one of them appears here. #}
+{% macro term(sign, coef, v, p, diff) %}
+<mtr><mtd></mtd><mtd{% if diff %} class="diff"{% endif %}><mo form="infix">{{ sign }}</mo><mn>{{ coef }}</mn>
+{%- if p > 0 %}<mo lspace="0.12em" rspace="0">&#x2062;</mo>
+{%- if v == "SG" %}{% if p == 1 %}<mi>SG</mi>{% else %}<msup><mi>SG</mi><mn>{{ p }}</mn></msup>{% endif %}
+{%- else %}{% if p == 1 %}<msub><mi>B</mi><mi>{{ v }}</mi></msub>{% else %}<msubsup><mi>B</mi><mi>{{ v }}</mi><mn>{{ p }}</mn></msubsup>{% endif %}
+{%- endif %}{% endif %}</mtd></mtr>
+{% endmacro %}
+
+{% block title %}Formulas · Beer OG Calculator{% endblock %}
+
+{% block scripts %}
+<script defer src="/static/js/gravity.js?v={{ build }}"></script>
+<script defer src="/static/js/store.js?v={{ build }}"></script>
+<script defer src="/static/js/formulas.js?v={{ build }}"></script>
+{% endblock %}
+
+{% block body %}
+<body class="doc" x-data="formulasPage">
+<div class="wrap">
+  <header class="top">
+    <a class="ghost back" href="/" @click="back($event)">← Back</a>
+    <div class="brand">
+      <img src="/static/icons/logo.svg?v={{ build }}" alt="" width="32" height="32">
+      <span>Formulas<small>how the numbers are made</small></span>
+    </div>
+  </header>
+
+  <main class="doc-main">
+    <p class="ex-intro">Worked through for <b x-text="ex.name">Check values</b>: OG <b x-text="f(ex.og, 3)">1.062</b>, refractometer <b x-text="f(ex.sg, 3)">1.044</b>, correction factor <b x-text="ex.wcf">1.04</b>.</p>
+
+    <section class="card">
+      <h2>Why the reading needs correcting</h2>
+      <p>A refractometer measures how much the sample bends light. Its scale is calibrated on sugar dissolved in water, so it is accurate on wort before the yeast is pitched.</p>
+      <p>Once fermentation starts, the alcohol bends light too, and the reading stays higher than the real gravity. Knowing the OG lets the formulas tell sugar and alcohol apart. That is why every fermentation asks for it.</p>
+      <p class="ex">Your batch: the refractometer shows <b x-text="f(ex.sg, 3)">1.044</b>, but the beer is really at <b class="hl" x-text="f(ex.fg[ex.formula], 4)">1.0305</b>.</p>
+    </section>
+
+    <section class="card">
+      <h2>1 · Gravity to Brix</h2>
+      <p>The formulas work in degrees Brix, so both the OG and the refractometer reading are converted first:</p>
+      <div class="eq"><math>
+        <mtable columnalign="right left">
+          <mtr><mtd><mi>Brix</mi><mo>(</mo><mi>SG</mi><mo>)</mo><mo>=</mo></mtd><mtd><mphantom><mo form="infix">−</mo></mphantom><mn>182.4601</mn><mo lspace="0.12em" rspace="0">&#x2062;</mo><msup><mi>SG</mi><mn>3</mn></msup></mtd></mtr>
+          {% call term("−", "775.6821", "SG", 2, false) %}
+          {% call term("+", "1262.7794", "SG", 1, false) %}
+          {% call term("−", "669.5622", "", 0, false) %}
+        </mtable>
+      </math></div>
+      <div class="eq"><math>
+        <msub><mi>B</mi><mi>o</mi></msub><mo>=</mo><mfrac><mrow><mi>Brix</mi><mo>(</mo><mi>OG</mi><mo>)</mo></mrow><mi>WCF</mi></mfrac>
+        <mspace width="1.5em"></mspace>
+        <msub><mi>B</mi><mi>r</mi></msub><mo>=</mo><mfrac><mrow><mi>Brix</mi><mo>(</mo><mi>reading</mi><mo>)</mo></mrow><mi>WCF</mi></mfrac>
+      </math></div>
+      <p><b>WCF</b>, the wort correction factor, makes up for wort not being pure sugar water. It is usually between 1.02 and 1.06, and 1.04 is the default. To find your own, measure unfermented wort with a hydrometer and the refractometer: WCF = refractometer Brix ÷ the Brix of the hydrometer's gravity. Set it in Settings.</p>
+      <p class="ex">Your batch: <b>B<sub>o</sub></b> = <b x-text="f(ex.ob, 2)">14.64</b> °Bx, <b>B<sub>r</sub></b> = <b x-text="f(ex.rb, 2)">10.46</b> °Bx.</p>
+    </section>
+
+    <section class="card">
+      <h2>2 · Corrected gravity, classic <span class="badge" x-show="ex.formula === 'old'">In use</span></h2>
+      <div class="eq"><math>
+        <mtable columnalign="right left">
+          <mtr><mtd><mi>FG</mi><mo>=</mo></mtd><mtd><mphantom><mo form="infix">−</mo></mphantom><mn>1.001843</mn></mtd></mtr>
+          {% call term("−", "0.002318474", "o", 1, false) %}
+          {% call term("−", "0.000007775", "o", 2, false) %}
+          {% call term("−", "0.000000034", "o", 3, false) %}
+          {% call term("+", "0.00574", "r", 1, false) %}
+          {% call term("+", "0.00003344", "r", 2, false) %}
+          {% call term("+", "0.000000086", "r", 3, false) %}
+        </mtable>
+      </math></div>
+      <p>The widely published form of Sean Terrill's cubic, and the default. It uses the original Brix and the current Brix, each already divided by the correction factor.</p>
+      <p class="ex">Your batch: FG = <b class="hl" x-text="f(ex.fg.old, 4)">1.0305</b></p>
+    </section>
+
+    <section class="card">
+      <h2>2 · Corrected gravity, 2011 revision <span class="badge" x-show="ex.formula === 'new'">In use</span></h2>
+      <div class="eq"><math>
+        <mtable columnalign="right left">
+          <mtr><mtd><mi>FG</mi><mo>=</mo></mtd><mtd><mphantom><mo form="infix">−</mo></mphantom><mn>1.0000</mn></mtd></mtr>
+          {% call term("−", "0.0044993", "o", 1, false) %}
+          {% call term("+", "0.011774", "r", 1, false) %}
+          {% call term("+", "0.00027581", "o", 2, false) %}
+          {% call term("−", "0.0012717", "r", 2, false) %}
+          {% call term("−", "0.0000072800", "o", 3, false) %}
+          {% call term("+", "0.000063293", "r", 3, false) %}
+        </mtable>
+      </math></div>
+      <p>Terrill's 2011 refit from a larger data set. It usually reads a few points lower than the classic cubic in the middle of fermentation.</p>
+      <p class="ex">Your batch: FG = <b class="hl" x-text="f(ex.fg.new, 4)">1.0273</b></p>
+    </section>
+
+    <section class="card">
+      <h2>2 · Corrected gravity, Apple Notes version <span class="badge" x-show="ex.formula === 'notes'">In use</span></h2>
+      <div class="eq"><math>
+        <mtable columnalign="right left">
+          <mtr><mtd><mi>FG</mi><mo>=</mo></mtd><mtd><mphantom><mo form="infix">−</mo></mphantom><mn>1.001843</mn></mtd></mtr>
+          {% call term("−", "0.0023184", "o", 1, true) %}
+          {% call term("+", "0.000007775", "o", 2, true) %}
+          {% call term("−", "0.000000034", "o", 3, false) %}
+          {% call term("+", "0.00574", "r", 1, false) %}
+          {% call term("+", "0.00003344", "r", 2, false) %}
+          {% call term("+", "0.000000086", "r", 3, false) %}
+        </mtable>
+      </math></div>
+      <p>Exactly what is in your Apple Note, kept as written until you check it. The <span class="diff-key">highlighted</span> terms differ from the classic: the first coefficient is shorter (0.0023184 instead of 0.002318474), and the squared term is added instead of subtracted, so this version reads higher.</p>
+      <p class="ex">Your batch: FG = <b class="hl" x-text="f(ex.fg.notes, 4)">1.0338</b></p>
+    </section>
+
+    <section class="card">
+      <h2>3 · ABV</h2>
+      <div class="eq"><math>
+        <mi>ABV</mi><mo>=</mo><mo>(</mo><mi>OG</mi><mo>−</mo><mi>FG</mi><mo>)</mo><mo>×</mo><mn>131.25</mn>
+      </math></div>
+      <p>The usual homebrew shortcut for alcohol by volume. It loses some accuracy for very strong beers.</p>
+      <p class="ex">Your batch: ABV = <b class="hl"><span x-text="pct(ex.abv, 2)">4.14</span> %</b></p>
+    </section>
+
+    <section class="card">
+      <h2>4 · Apparent attenuation</h2>
+      <div class="eq"><math>
+        <mi>Attenuation</mi><mo>=</mo><mfrac><mrow><mi>OG</mi><mo>−</mo><mi>FG</mi></mrow><mrow><mi>OG</mi><mo>−</mo><mn>1</mn></mrow></mfrac><mo>×</mo><mn>100</mn>
+      </math></div>
+      <p>How much of the sugar the yeast has eaten so far. It is "apparent" because alcohol is lighter than water and pulls the measured gravity down, so the figure is a little higher than the real one.</p>
+      <p class="ex">Your batch: <b class="hl"><span x-text="pct(ex.att, 0)">51</span> %</b></p>
+    </section>
+
+    <section class="card">
+      <h2>5 · Points left</h2>
+      <div class="eq"><math>
+        <mi>Points</mi><mo>=</mo><mo>(</mo><mi>FG</mi><mo>−</mo><mn>1</mn><mo>)</mo><mo>×</mo><mn>1000</mn>
+      </math></div>
+      <p>The corrected gravity in brewer's "points": 1.030 is 30 points. Useful for watching the last few points drop as fermentation finishes.</p>
+      <p class="ex">Your batch: <b class="hl" x-text="Math.round(ex.pts)">30</b> points</p>
+    </section>
+
+    <section class="card">
+      <h2>Warnings</h2>
+      <ul>
+        <li><b>Reading equals the OG:</b> nothing has fermented yet, so there is nothing to correct.</li>
+        <li><b>Corrected gravity below 0.996:</b> lower than beer usually gets. The OG or the reading is probably wrong.</li>
+      </ul>
+    </section>
+
+    <p class="src">The cubic formulas come from Sean Terrill, <a href="http://seanterrill.com/2011/04/07/refractometer-fg-results/" target="_blank" rel="noopener">“Refractometer FG Results”</a> (2011).</p>
+  </main>
+</div>
+</body>
+{% endblock %}

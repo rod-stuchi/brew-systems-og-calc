@@ -166,3 +166,38 @@ body { margin: 0; }
 /* The OG marker's label sits outside the 240×240 viewBox when the OG is near
    the top of the scale; let it draw rather than clip. */
 .knob svg { overflow: visible; }
+/* The page-wide focus outline would ring the whole dial and cover the OG
+   marker; the knob's rim shows focus instead. */
+.knob:focus-visible { outline: none; }
+.knob .face { stroke: var(--knob-edge); transition: stroke .15s; }
+.knob:focus-visible .face { stroke: var(--amber); stroke-width: 2.5; }
+
+/* ---------- Header actions ---------- */
+.top-actions { display: flex; gap: 8px; align-items: center; flex: 0 0 auto; }
+a.ghost { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.help { min-width: 36px; min-height: 36px; padding: 6px 0; font-weight: 700; }
+
+/* ---------- Formulas page ---------- */
+body.doc { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+.doc .top { justify-content: flex-start; }
+.doc .back { flex: 0 0 auto; }
+.doc-main { display: grid; gap: 12px; padding-block: 8px 0; }
+.ex-intro { margin: 0; color: var(--muted); font-size: 14px; }
+.ex-intro b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
+.card h2 { font-family: var(--f-num); font-weight: 600; font-size: 20px; line-height: 1.15; text-transform: uppercase; letter-spacing: .03em; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.card p, .card ul { margin: 0; }
+.card ul { padding-left: 20px; display: grid; gap: 6px; }
+.eq { overflow-x: auto; padding-block: 4px; }
+.eq math { math-style: normal; font-family: math; font-size: 1.15em; }
+/* Chrome's MathML Core ignores columnalign: align the columns here. */
+.eq mtd { padding-block: 3px; text-align: left; }
+.eq mtd:first-child { text-align: right; }
+.diff, .diff-key { background: var(--amber-soft); color: var(--amber); border-radius: 3px; }
+.diff-key { padding-inline: 3px; }
+.ex { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; border-top: 1px dashed var(--line); padding-top: 8px; }
+.ex b { color: var(--ink); }
+.ex .hl, .ex .hl span { color: var(--amber); font-weight: 700; }
+.badge { font-family: var(--f-body); font-size: 11px; font-weight: 700; letter-spacing: .06em; background: var(--amber-soft); color: var(--amber); border-radius: 999px; padding: 2px 8px; }
+.src { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.src a { color: var(--amber); }

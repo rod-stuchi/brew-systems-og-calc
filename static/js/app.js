@@ -1,39 +1,9 @@
 /* The app's behavior: one reactive state object, saved to localStorage.
    Ported from the prototype's render loop to Alpine templates; the math is
-   gravity.js, the dial is knob.js, the chart is spark.js. */
+   gravity.js, the dial is knob.js, the chart is spark.js, storage is store.js. */
 (function () {
   const G = window.Gravity;
-  const KEY = 'beer-og-calc.v1';
-  const uid = () => Math.random().toString(36).slice(2, 9);
-
-  /* ---------- Storage: one key, every access guarded ---------- */
-  function seed() {
-    const id = uid(), now = Date.now(), d = 864e5;
-    return {
-      wcf: 1.04, formula: 'old', active: id,
-      sheets: [{
-        id, name: 'Pale Ale (example)', og: 1.062, current: 1.044,
-        readings: [{ t: now - 4 * d, sg: 1.056 }, { t: now - 3 * d, sg: 1.050 }, { t: now - 2 * d, sg: 1.046 }, { t: now - 0.3 * d, sg: 1.044 }],
-      }],
-    };
-  }
-  function load() {
-    try {
-      const s = JSON.parse(localStorage.getItem(KEY));
-      if (s && Array.isArray(s.sheets)) return s;
-    } catch (e) {}
-    return null;
-  }
-  function write(state) {
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
-  }
-  function initialState() {
-    const s = load() || seed();
-    if (!G.FORMULAS[s.formula]) s.formula = 'old';
-    if (!(s.wcf > 0)) s.wcf = 1.04;
-    if (!s.sheets.some(x => x.id === s.active)) s.active = s.sheets.length ? s.sheets[0].id : null;
-    return s;
-  }
+  const { uid, write, initialState } = window.Store;
 
   document.addEventListener('alpine:init', () => {
     /* ---------- Root: state, sheets, readout, log ---------- */
@@ -185,7 +155,7 @@
         down(e) {
           drag = { x: e.clientX, y: e.clientY, acc: 0 };
           e.currentTarget.setPointerCapture(e.pointerId);
-          e.currentTarget.focus({ preventScroll: true });
+          e.currentTarget.focus({ preventScroll: true, focusVisible: false });
         },
         // 5 px = 0.001; up or right raises the value.
         move(e) {

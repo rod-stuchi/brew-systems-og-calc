@@ -39,7 +39,8 @@
     K.og = el('path', { d: '', fill: 'var(--amber)' }, svg);
     K.ogText = el('text', { 'text-anchor': 'middle', fill: 'var(--amber)', 'font-size': 8, 'font-weight': 700, 'font-family': 'var(--f-body)' }, svg);
     K.ogText.textContent = 'OG';
-    el('circle', { cx: C, cy: C, r: 66, fill: 'var(--knob)', stroke: 'var(--knob-edge)', 'stroke-width': 1.5 }, svg);
+    // Its rim is styled in app.css: it turns amber to show keyboard focus.
+    el('circle', { class: 'face', cx: C, cy: C, r: 66, fill: 'var(--knob)', 'stroke-width': 1.5 }, svg);
     K.rot = el('g', {}, svg);
     for (let i = 0; i < 36; i++) {
       const a = i * 10, [x0, y0] = pt(62, a), [x1, y1] = pt(66, a);

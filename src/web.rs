@@ -1,4 +1,4 @@
-//! The four routes. Nothing here reads or writes user data.
+//! The routes. Nothing here reads or writes user data.
 
 use crate::assets::{self, NO_CACHE};
 use askama::Template;
@@ -10,6 +10,7 @@ use axum::routing::get;
 pub fn app() -> Router {
     Router::new()
         .route("/", get(index))
+        .route("/formulas", get(formulas))
         .route("/sw.js", get(service_worker))
         .route("/manifest.webmanifest", get(assets::manifest))
         .route("/static/{*path}", get(assets::file))
@@ -44,6 +45,18 @@ struct Index {
 
 async fn index() -> impl IntoResponse {
     Rendered("text/html; charset=utf-8", Index { build: assets::build_id() })
+}
+
+/// The equations behind every number, with explanations. Static markup; the
+/// worked example is filled in on the client from localStorage.
+#[derive(Template)]
+#[template(path = "formulas.html")]
+struct Formulas {
+    build: String,
+}
+
+async fn formulas() -> impl IntoResponse {
+    Rendered("text/html; charset=utf-8", Formulas { build: assets::build_id() })
 }
 
 #[derive(Template)]

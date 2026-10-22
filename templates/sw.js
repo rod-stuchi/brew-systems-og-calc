@@ -8,6 +8,7 @@
 const CACHE = 'ogcalc-{{ build }}';
 const ASSETS = [
   '/',
+  '/formulas',
   '/manifest.webmanifest',
 {%- for a in assets %}
   '/static/{{ a }}?v={{ build }}',
@@ -32,16 +33,17 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // The page: network first, so a new build shows up as soon as it is online;
-  // the cached copy when there is no network.
+  // Pages: network first, so a new build shows up as soon as it is online;
+  // the cached copy of that page when there is no network, else the calculator.
   if (req.mode === 'navigate') {
+    const path = url.pathname;
     e.respondWith(
       fetch(req)
         .then((res) => {
-          if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put('/', copy)); }
+          if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(path, copy)); }
           return res;
         })
-        .catch(() => caches.match('/'))
+        .catch(() => caches.match(path).then((hit) => hit || caches.match('/')))
     );
     return;
   }

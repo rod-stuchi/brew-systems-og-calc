@@ -1,4 +1,4 @@
-//! Smoke tests over the four routes, driven through the router directly.
+//! Smoke tests over the routes, driven through the router directly.
 
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
@@ -28,6 +28,40 @@ async fn index_links_versioned_assets_and_the_manifest() {
     assert!(body.contains(&format!("/static/js/app.js?v={v}")));
     assert!(body.contains(&format!("/static/icons/logo.svg?v={v}")));
     assert!(body.contains(r#"<link rel="manifest" href="/manifest.webmanifest">"#));
+    assert!(body.contains(r#"href="/formulas""#), "the ? button links to the formulas page");
+}
+
+#[tokio::test]
+async fn formulas_page_renders_with_its_own_scripts() {
+    let (status, h, body) = get("/formulas").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(ct(&h).starts_with("text/html"));
+    let v = ogcalc::assets::build_id();
+    assert!(body.contains("<math"));
+    assert!(body.contains(&format!("/static/js/store.js?v={v}")));
+    assert!(body.contains(&format!("/static/js/formulas.js?v={v}")));
+    assert!(!body.contains("/static/js/app.js"), "the calculator's script stays off this page");
+}
+
+/// The page writes the equations out by hand; gravity.js is what runs. Every
+/// decimal constant in the Brix conversion and the FG formulas must appear on
+/// the page as a MathML number, so editing one without the other fails here.
+#[tokio::test]
+async fn formulas_page_shows_every_constant_in_gravity_js() {
+    let src = include_str!("../static/js/gravity.js");
+    let start = src.find("const brix").unwrap();
+    let end = src.find("const NOTES").unwrap();
+    let mut consts: Vec<&str> = src[start..end]
+        .split(|c: char| !(c.is_ascii_digit() || c == '.'))
+        .filter(|t| t.contains('.') && t.starts_with(|c: char| c.is_ascii_digit()))
+        .collect();
+    assert!(src.contains("* 131.25"), "ABV factor moved; update this test");
+    consts.push("131.25");
+    assert!(consts.len() > 15, "found only {consts:?}");
+
+    let (_, _, body) = get("/formulas").await;
+    let missing: Vec<_> = consts.iter().filter(|c| !body.contains(&format!("<mn>{c}</mn>"))).collect();
+    assert!(missing.is_empty(), "constants in gravity.js but not on /formulas: {missing:?}");
 }
 
 #[tokio::test]
@@ -38,6 +72,7 @@ async fn service_worker_precaches_this_build() {
     assert_eq!(h.get(header::CACHE_CONTROL).unwrap(), "no-cache");
     let v = ogcalc::assets::build_id();
     assert!(body.contains(&format!("'ogcalc-{v}'")));
+    assert!(body.contains("'/formulas',"));
     assert!(body.contains(&format!("'/static/js/vendor/alpine.min.js?v={v}'")));
     assert!(!body.contains(".txt?v="), "license texts are not precached");
 }

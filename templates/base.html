@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Beer OG Calculator{% endblock %}</title>
+<meta name="description" content="Corrects refractometer readings for alcohol during fermentation: current gravity, ABV and attenuation.">
+<meta name="theme-color" content="#edf0ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111513" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="OG Calc">
+<link rel="icon" href="/static/icons/favicon.ico?v={{ build }}" sizes="48x48">
+<link rel="icon" href="/static/icons/favicon.svg?v={{ build }}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png?v={{ build }}">
+<link rel="mask-icon" href="/static/icons/icon-mono.svg?v={{ build }}" color="#0d1b2a">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/static/fonts/barlow-condensed-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/static/css/fonts.css?v={{ build }}">
+<link rel="stylesheet" href="/static/css/app.css?v={{ build }}">
+{#- Page scripts first, Alpine last: each page registers its components on alpine:init. #}
+{% block scripts %}{% endblock %}
+<script defer src="/static/js/vendor/alpine.min.js?v={{ build }}"></script>
+</head>
+{% block body %}{% endblock %}
+</html>
