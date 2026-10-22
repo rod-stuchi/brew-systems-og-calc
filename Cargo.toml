@@ -1,0 +1,28 @@
+[package]
+name = "ogcalc"
+version = "0.1.0"
+edition = "2024"
+
+# The server holds no state: it renders the shell, the manifest and the
+# service worker, and serves the embedded assets. Every calculation and every
+# byte of user data lives in the browser (see og-calculator-handoff.md).
+
+[dependencies]
+# default-features = false, and no "json": there is no API to speak it.
+axum = { version = "0.8", default-features = false, features = ["http1", "tokio", "query"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal"] }
+# 0.14 to match FFM, so a later merge into the main system is a move, not a port.
+# No askama_axum in 0.14; src/web.rs carries the local Html<T> newtype.
+askama = "0.14"
+# static/ is compiled into the binary in release builds; debug builds read it
+# from disk, so CSS/JS edits show on reload without a rebuild.
+rust-embed = { version = "8", features = ["mime-guess", "include-exclude"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+
+[profile.dev]
+opt-level = 1

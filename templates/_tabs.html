@@ -1,0 +1,10 @@
+<nav class="tabs" aria-label="Fermentations">
+  <button class="tab-add" @click="addSheet()" aria-label="Add fermentation" title="Add fermentation">+</button>
+  <div class="tab-list" role="tablist">
+    <template x-for="(s, i) in state.sheets" :key="s.id">
+      <button class="tab" role="tab" :aria-selected="String(s.id === state.active)" @click="select(s.id)">
+        <b x-text="label(s, i)"></b><span x-text="tabLine(s)"></span>
+      </button>
+    </template>
+  </div>
+</nav>

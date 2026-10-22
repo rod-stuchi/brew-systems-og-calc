@@ -1,0 +1,85 @@
+    <template x-if="!sheet">
+      <div class="empty">
+        <h2>No fermentations</h2>
+        <p>Add one with the + at the bottom. You only need the OG you measured before pitching the yeast.</p>
+        <button class="primary" @click="addSheet()">Add fermentation</button>
+      </div>
+    </template>
+
+    <template x-if="sheet">
+      <div>
+        <div class="fields">
+          <label class="f"><span>Name (optional)</span><input type="text" id="name" placeholder="e.g. Session IPA #4" autocomplete="off" x-model="sheet.name"></label>
+          <label class="f"><span>OG, before pitching</span>
+            <div class="og-in">
+              <input type="text" inputmode="decimal" autocomplete="off" x-model="ogText" @input="liveOg()" @change="commitOg()" @keydown.enter="$el.blur()">
+              <em x-text="`${c.ob.toFixed(1)} °Bx`"></em>
+            </div>
+          </label>
+        </div>
+
+        <div class="bench">
+          <div class="dial" x-data="knob">
+            <div class="dial-label">Refractometer reading</div>
+            <div class="knob" tabindex="0" role="slider" aria-label="Refractometer reading" aria-valuemin="0.990" aria-valuemax="1.130"
+                 :aria-valuenow="sheet.current.toFixed(3)" :aria-valuetext="`${sheet.current.toFixed(3)} specific gravity`"
+                 @pointerdown.prevent="down($event)" @pointermove="move($event)" @pointerup="up()" @pointercancel="up()"
+                 @wheel.prevent="nudge($event.deltaY < 0 ? 1 : -1)" @keydown="key($event)">
+              <svg viewBox="0 0 240 240" aria-hidden="true" x-effect="draw($el)"></svg>
+              <div class="knob-read"><b x-text="sheet.current.toFixed(3)"></b><span x-text="`${c.rb.toFixed(1)} °Bx`"></span></div>
+            </div>
+            <div class="fine">
+              <button aria-label="Lower reading by 0.001"
+                      @pointerdown.prevent="hold(-1)" @pointerup="stop()" @pointerleave="stop()" @pointercancel="stop()"
+                      @keydown.enter.prevent="nudge(-1)" @keydown.space.prevent="nudge(-1)">−</button>
+              <small>drag, scroll or tap ±0.001</small>
+              <button aria-label="Raise reading by 0.001"
+                      @pointerdown.prevent="hold(1)" @pointerup="stop()" @pointerleave="stop()" @pointercancel="stop()"
+                      @keydown.enter.prevent="nudge(1)" @keydown.space.prevent="nudge(1)">+</button>
+            </div>
+          </div>
+
+          <div class="readout">
+            <div class="big">
+              <div class="k">Corrected gravity</div>
+              <div class="v" x-text="c.fg.toFixed(4)"></div>
+              <div class="sub">What a hydrometer would read now</div>
+            </div>
+            <div class="stats">
+              <div class="stat"><div class="k">ABV</div><div class="v"><span x-text="pct(c.abv, 2)"></span><small>%</small></div></div>
+              <div class="stat"><div class="k">Attenuation</div><div class="v"><span x-text="pct(c.att, 0)"></span><small>%</small></div></div>
+              <div class="stat"><div class="k">Points left</div><div class="v" x-text="Math.round(c.pts)"></div></div>
+            </div>
+            <p class="warn" x-show="warning" x-text="warning"></p>
+            <button class="primary" @click="logReading()" x-text="logged ? 'Logged' : 'Log this reading'"></button>
+          </div>
+        </div>
+
+        <section class="log">
+          <div class="log-head"><h2>Readings</h2><span x-text="logMeta"></span></div>
+          <div class="spark" x-show="sheet.readings.length >= 2" x-effect="spark($el)"><svg preserveAspectRatio="none"></svg></div>
+          <div class="tbl">
+            <p class="empty-log" x-show="!rows.length">No readings logged yet. Set the dial to what your refractometer shows and tap “Log this reading”.</p>
+            <table x-show="rows.length">
+              <thead><tr><th>When</th><th>Refrac.</th><th>Corrected</th><th>ABV</th><th></th></tr></thead>
+              <tbody>
+                <template x-for="r in rows" :key="r.t">
+                  <tr>
+                    <td x-text="fmtDate(r.t)"></td>
+                    <td x-text="r.sg.toFixed(3)"></td>
+                    <td class="fg" x-text="calcFor(sheet, r.sg).fg.toFixed(4)"></td>
+                    <td x-text="`${pct(calcFor(sheet, r.sg).abv, 2)}%`"></td>
+                    <td><button class="x" @click="deleteReading(r.t)" aria-label="Delete reading">×</button></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="foot">
+          <button class="danger-btn" :class="{ solid: armed }" @click="armDelete()" x-text="armed ? 'Tap again to delete' : 'Delete this fermentation'"></button>
+          <span x-text="deleteMsg"></span>
+        </div>
+      </div>
+    </template>

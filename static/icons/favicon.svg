@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><rect width="512" height="512" rx="112" fill="#0d1b2a"/>
+  <defs>
+    <clipPath id="fs"><circle cx="256" cy="256" r="204"/></clipPath>
+    <clipPath id="ts"><rect x="0" y="0" width="1000" height="287.2244897959184"/></clipPath>
+    <clipPath id="bs"><rect x="0" y="287.2244897959184" width="1000" height="1000"/></clipPath>
+    <linearGradient id="gs" x1="0" y1="52" x2="0" y2="287.2244897959184" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1d63c4"/><stop offset="1" stop-color="#3f93f2"/>
+    </linearGradient>
+  </defs>
+  <g clip-path="url(#fs)">
+    <rect x="0" y="0" width="1000" height="287.2244897959184" fill="url(#gs)"/>
+    <rect x="0" y="287.2244897959184" width="1000" height="1000" fill="#f5f9fd"/>
+    <g clip-path="url(#ts)" stroke-linecap="butt"><line x1="197.71428571428572" y1="117.57142857142856" x2="197.71428571428572" y2="394.42857142857144" stroke="#ffffff" stroke-width="27.06122448979592"/><line x1="197.71428571428572" y1="131.1020408163265" x2="320.53061224489795" y2="131.1020408163265" stroke="#ffffff" stroke-width="27.06122448979592"/><line x1="197.71428571428572" y1="193.55102040816325" x2="260.16326530612247" y2="193.55102040816325" stroke="#ffffff" stroke-width="22.89795918367347"/><line x1="197.71428571428572" y1="256" x2="320.53061224489795" y2="256" stroke="#ffffff" stroke-width="27.06122448979592"/><line x1="197.71428571428572" y1="318.44897959183675" x2="260.16326530612247" y2="318.44897959183675" stroke="#ffffff" stroke-width="22.89795918367347"/><line x1="197.71428571428572" y1="380.8979591836735" x2="320.53061224489795" y2="380.8979591836735" stroke="#ffffff" stroke-width="27.06122448979592"/></g>
+    <g clip-path="url(#bs)" stroke-linecap="butt"><line x1="197.71428571428572" y1="117.57142857142856" x2="197.71428571428572" y2="394.42857142857144" stroke="#1a56ad" stroke-width="27.06122448979592"/><line x1="197.71428571428572" y1="131.1020408163265" x2="320.53061224489795" y2="131.1020408163265" stroke="#1a56ad" stroke-width="27.06122448979592"/><line x1="197.71428571428572" y1="193.55102040816325" x2="260.16326530612247" y2="193.55102040816325" stroke="#1a56ad" stroke-width="22.89795918367347"/><line x1="197.71428571428572" y1="256" x2="320.53061224489795" y2="256" stroke="#1a56ad" stroke-width="27.06122448979592"/><line x1="197.71428571428572" y1="318.44897959183675" x2="260.16326530612247" y2="318.44897959183675" stroke="#1a56ad" stroke-width="22.89795918367347"/><line x1="197.71428571428572" y1="380.8979591836735" x2="320.53061224489795" y2="380.8979591836735" stroke="#1a56ad" stroke-width="27.06122448979592"/></g>
+  </g>
+  
+</svg>
