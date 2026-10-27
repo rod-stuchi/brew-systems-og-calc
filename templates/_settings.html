@@ -10,4 +10,8 @@
       </select>
     </label>
     <p x-text="notes[state.formula]"></p>
+    <div class="update">
+      <span>Version {{ build }}. Your fermentations are kept when updating.</span>
+      <button class="ghost" @click="refresh()" :disabled="updating" x-text="updating ? 'Updating…' : 'Get latest version'">Get latest version</button>
+    </div>
   </section>

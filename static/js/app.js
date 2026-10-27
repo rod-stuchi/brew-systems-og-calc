@@ -17,6 +17,7 @@
         armed: false,
         logged: false,
         resizeTick: 0,
+        updating: false,
 
         init() {
           this.$watch('state', () => { clearTimeout(saveT); saveT = setTimeout(() => write(this.state), 200); });
@@ -103,6 +104,24 @@
         setWcf(str) {
           const v = parseFloat(String(str).replace(',', '.'));
           if (v >= 0.9 && v <= 1.2) this.state.wcf = v;
+        },
+
+        /* Drops the offline copy and loads the app fresh from the server; the
+           page registers a new service worker, which caches the new build.
+           Only the app's files go: fermentations live in localStorage. */
+        async refresh() {
+          this.updating = true;
+          try {
+            if ('serviceWorker' in navigator) {
+              const regs = await navigator.serviceWorker.getRegistrations();
+              await Promise.all(regs.map(r => r.unregister()));
+            }
+            if ('caches' in window) {
+              const keys = await caches.keys();
+              await Promise.all(keys.filter(k => k.startsWith('ogcalc-')).map(k => caches.delete(k)));
+            }
+          } catch (e) {}
+          location.reload();
         },
 
         /* Readings */

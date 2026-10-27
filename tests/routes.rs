@@ -29,6 +29,7 @@ async fn index_links_versioned_assets_and_the_manifest() {
     assert!(body.contains(&format!("/static/icons/logo.svg?v={v}")));
     assert!(body.contains(r#"<link rel="manifest" href="/manifest.webmanifest">"#));
     assert!(body.contains(r#"href="/formulas""#), "the ? button links to the formulas page");
+    assert!(body.contains(&format!("Version {v}.")), "settings shows the running build");
 }
 
 #[tokio::test]

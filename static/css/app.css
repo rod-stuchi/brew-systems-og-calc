@@ -41,12 +41,14 @@ button, input, select { font: inherit; color: inherit; }
 
 .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 16px 8px; }
 .brand { font-family: var(--f-num); font-weight: 700; font-size: 22px; letter-spacing: .02em; text-transform: uppercase; }
-.brand small { font-family: var(--f-body); font-weight: 400; font-size: 12px; color: var(--muted); text-transform: none; letter-spacing: 0; margin-left: 6px; }
+.brand small { font-family: var(--f-body); font-weight: 400; font-size: 12px; color: var(--muted); text-transform: none; letter-spacing: 0; }
 .ghost { background: none; border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; color: var(--muted); }
 .ghost:hover { color: var(--ink); border-color: var(--muted); }
 
 .settings { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 12px; }
 .settings p { grid-column: 1 / -1; margin: 0; color: var(--muted); font-size: 13px; }
+.settings .update { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 12px; color: var(--muted); font-size: 13px; }
+.settings .update button:disabled { opacity: .6; cursor: progress; }
 
 label.f { display: grid; gap: 4px; min-width: 0; }
 label.f > span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -152,15 +154,19 @@ body { margin: 0; }
 /* Standalone mode on iOS draws under the status bar. */
 .top { padding-top: max(16px, env(safe-area-inset-top, 0px)); }
 
-.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.brand img { flex: 0 0 auto; width: 32px; height: 32px; display: block; }
-.brand span { min-width: 0; }
+/* Logo centered on a two-line block: the title on one line, the subtitle
+   always under it. The title shrinks on narrow phones rather than wrap. */
+.brand { display: flex; align-items: center; gap: 12px; min-width: 0; line-height: 1.1; }
+.brand img { flex: 0 0 auto; width: 44px; height: 44px; display: block; }
+.brand span { min-width: 0; white-space: nowrap; }
+.brand small { display: block; margin: 3px 0 0; }
 @media (max-width: 640px) {
-  .brand img { width: 28px; height: 28px; }
+  .brand { font-size: 20px; gap: 10px; }
+  .brand img { width: 40px; height: 40px; }
 }
-@media (max-width: 420px) {
-  .brand { font-size: 20px; line-height: 1.1; }
-  .brand small { display: block; margin-left: 0; margin-top: 2px; }
+@media (max-width: 370px) {
+  .brand { font-size: 18px; gap: 8px; }
+  .brand img { width: 34px; height: 34px; }
 }
 
 /* The OG marker's label sits outside the 240×240 viewBox when the OG is near
